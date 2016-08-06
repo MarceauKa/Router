@@ -155,7 +155,13 @@ $router->get('profil/{:num}/{:alpha}', function ($id, $name) {
 
 ## Tests
 
-Bientôt !
+Les tests sont effectués avec PHPUnit 5.5. Si vous n'avez pas **phpunit** installé globalement, ils peuvent l'être via **vendor/bin**.
+
+```bash
+vendor/bin/phpunit
+```
+
+Les tests ne sont pas encore tous en place. N'hésitez pas à contribuer.
 
 ## Contribuer
 
