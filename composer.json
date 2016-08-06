@@ -7,10 +7,18 @@
     "require": {
         "php": ">=5.4"
     },
+    "require-dev": {
+        "phpunit/phpunit": "5.5.*"
+    },
     "license": "MIT",
     "autoload": {
         "psr-4": {
             "Akibatech\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Akibatech\\Tests\\": "tests/"
         }
     },
     "authors": [

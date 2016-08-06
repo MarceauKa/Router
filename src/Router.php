@@ -86,7 +86,7 @@ class Router
      */
     public static function getInstance()
     {
-        if (is_null(self::$router))
+        if (is_null(self::$router) === true)
         {
             self::$router = new self;
         }
@@ -97,15 +97,38 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
+     * Retourne une nouvelle instance du Routeur.
+     *
+     * @param   void
+     * @return  Router
+     */
+    public static function renewInstance()
+    {
+        if (is_null(self::$router) === false)
+        {
+            self::$router = new self;
+        }
+
+        return self::getInstance();
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * Le routeur écoute...
      *
-     * @param   int $dispatch
+     * @param   string|null $request_uri    Permet de spoofer l'URI de la requête.
+     * @param   string|null $request_method Permet de spoofer la méthode de la requête.
      * @return  self
      */
-    public function listen()
+    public function listen($request_uri = null, $request_method = null)
     {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $uri    = trim($_SERVER['REQUEST_URI'], '/');
+        $method = $this->getRequestMethod($request_method);
+        $uri    = $this->getRequestUri($request_uri);
+
+        // Remet à zéro les routes matchées
+        $this->matched_parameters = [];
+        $this->current            = null;
 
         if (count($this->routes) > 0)
         {
@@ -250,29 +273,31 @@ class Router
             '.',
             '-',
             '?',
-            '&'
+            '&',
+            '/'
         ], [
             '\.',
             '\-',
             '\?',
-            '\&'
+            '\&',
+            '\/'
         ], $uri);
 
         // Boucle tant que la chaîne contient { ou }.
         // Attention le != est volontaire : preg_match peut retourner 0 ou false.
-        while (false != preg_match('/\{(.*)+\}/', $uri))
+        while (false != preg_match('/\{\:(.*)+\}/', $uri))
         {
             // Transforme :num
-            $uri = preg_replace('/\{\:num\}/i', '([0-9]+)', $uri);
+            $uri = preg_replace('/\{\:num\}/', '([0-9]+)', $uri);
 
             // Transforme :string
-            $uri = preg_replace('/\{\:alpha\}/i', '([a-z]+)', $uri);
+            $uri = preg_replace('/\{\:alpha\}/', '([a-z]+)', $uri);
 
             // Transforme :any
-            $uri = preg_replace('/\{\:any\}/i', '([a-z0-9\_\.\:\,\-]+)', $uri);
+            $uri = preg_replace('/\{\:any\}/', '([a-z0-9\_\.\:\,\-]+)', $uri);
 
             // Transforme :slug
-            $uri = preg_replace('/\{\:slug\}/i', '([a-z0-9\-]+)', $uri);
+            $uri = preg_replace('/\{\:slug\}/', '([a-z0-9\-]+)', $uri);
         }
 
         return $uri;
@@ -313,7 +338,7 @@ class Router
         $route = $this->getIndexedRoute($index);
 
         // Construit le pattern
-        $pattern = '#^' . $route['uri'] . '$#i';
+        $pattern = '#^' . $route['uri'] . '$#iu';
 
         // Stocke temporairement les paramètres matchés
         $matches = [];
@@ -450,7 +475,7 @@ class Router
      */
     public function whenNotFound($callback)
     {
-        $this->dispatch_default = ($callback);
+        $this->dispatch_default = $callback;
 
         return $this;
     }
@@ -483,6 +508,59 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
+     * Retourne la méthode de la requête.
+     *
+     * @param   void
+     * @return  string
+     */
+    protected function getRequestMethod($default = null)
+    {
+        // CLI ?
+        if ($this->isCliRequest())
+        {
+            return is_null($default) ? 'GET' : strtoupper($default);
+        }
+
+        return strtoupper($_SERVER['REQUEST_METHOD']);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Retourne l'URI de la requête.
+     *
+     * @param   void
+     * @return  string
+     */
+    protected function getRequestUri($default = null)
+    {
+        // CLI ?
+        if ($this->isCliRequest())
+        {
+            return is_null($default) ? '' : $default;
+        }
+
+        return trim($_SERVER['REQUEST_URI'], '/');
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Vérifie si la requête est de type CLI.
+     *
+     * @param   void
+     * @return  bool
+     */
+    protected function isCliRequest()
+    {
+        return (php_sapi_name() == 'cli'
+            OR defined('STDIN')
+            OR array_key_exists('REQUEST_METHOD', $_SERVER) === false);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * Appel de méthode dynamique.
      * Utile pour les méthodes get(), post(), put() qui sont des alias de add().
      *
@@ -495,12 +573,16 @@ class Router
         // Ajout dynamique par verbe HTTP.
         if (in_array(strtoupper($method), $this->methods))
         {
-            return $this->add([$method], $args[0], $args[1], $args[2]);
+            $as = !empty($args[2]) ? $args[2] : null;
+
+            return $this->add([$method], $args[0], $args[1], $as);
         }
         // Méthode "any" => Correspond à tous les verbes.
         else if ($method === 'any')
         {
-            return $this->add($this->methods, $args[0], $args[1], $args[2]);
+            $as = !empty($args[2]) ? $args[2] : null;
+
+            return $this->add($this->methods, $args[0], $args[1], $as);
         }
 
         throw new \BadMethodCallException("Invalid method \"$method\".");
