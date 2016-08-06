@@ -1,5 +1,7 @@
 # Router
 
+[![Build Status](https://travis-ci.org/AkibaTech/Router.svg?branch=master)](https://travis-ci.org/AkibaTech/Router)
+
 Router est un petit routeur de requête HTTP écrit en PHP.  
 
 Il fait le job, bien que pas encore testé. Utilisez le si vous avez besoin d'une **base simple à comprendre** ou si **votre besoin est minimal**. Sinon, regardez du côté des merveilleuses librairies [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou encore [league/route](http://route.thephpleague.com/).
