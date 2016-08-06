@@ -1,0 +1,23 @@
+{
+    "name": "akibatech/router",
+    "description": "Routeur HTTP basique écrit en PHP.",
+    "version": "0.0.1",
+    "type": "library",
+    "keywords": ["routeur", "router", "library", "simple"],
+    "require": {
+        "php": "5.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Akibatech\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MarceauKa",
+            "email": "marceau@casals.fr"
+        }
+    ],
+    "minimum-stability": "stable"
+}
