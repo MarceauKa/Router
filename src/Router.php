@@ -284,8 +284,7 @@ class Router
         ], $uri);
 
         // Boucle tant que la chaîne contient { ou }.
-        // Attention le != est volontaire : preg_match peut retourner 0 ou false.
-        while (false != preg_match('/\{\:(.*)+\}/', $uri))
+        while (false !== preg_match('/\{\:(.*)+\}/', $uri))
         {
             // Transforme :num
             $uri = preg_replace('/\{\:num\}/', '([0-9]+)', $uri);
