@@ -7,7 +7,7 @@ Il fait le job, bien que pas encore testé. Utilisez le si vous avez besoin d'un
 ## Installation
 
 L'installation se fait idéalement via composer.  
-`composer require akibatech/router @dev-master`
+`composer require akibatech/router dev-master`
 
 Ou sinon, copiez le fichier **src/Router.php** où vous le souhaitez et faites en un **require**.
 
