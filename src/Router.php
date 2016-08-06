@@ -343,8 +343,7 @@ class Router
         // Stocke temporairement les paramètres matchés
         $matches = [];
 
-        if (preg_match_all($pattern, $uri, $matches) > 0
-            AND in_array($method, $route['methods'])
+        if (preg_match_all($pattern, $uri, $matches) > 0 && in_array($method, $route['methods'])
         )
         {
             // Prépare les paramètres matchés.
@@ -554,8 +553,8 @@ class Router
     protected function isCliRequest()
     {
         return (php_sapi_name() == 'cli'
-            OR defined('STDIN')
-            OR array_key_exists('REQUEST_METHOD', $_SERVER) === false);
+            || defined('STDIN')
+            || array_key_exists('REQUEST_METHOD', $_SERVER) === false);
     }
 
     //-------------------------------------------------------------------------
