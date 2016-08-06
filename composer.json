@@ -1,9 +1,9 @@
 {
     "name": "akibatech/router",
     "description": "Routeur HTTP basique écrit en PHP sans aucune dépendance.",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "library",
-    "keywords": ["routeur", "router", "library", "simple"],
+    "keywords": ["routeur", "router", "library", "simple", "routes", "rest", "http"],
     "require": {
         "php": ">=5.4"
     },
