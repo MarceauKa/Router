@@ -46,6 +46,13 @@ class Router
     protected $namespace;
 
     /**
+     * Action par défaut quand aucune route n'est matchée.
+     *
+     * @var string|callable
+     */
+    protected $dispatch_default;
+
+    /**
      * @var array
      */
     protected $methods = [
@@ -110,6 +117,8 @@ class Router
                     return $this->dispatchCurrent();
                 }
             }
+
+            return $this->dispatchDefault();
         }
 
         return $this;
@@ -119,12 +128,18 @@ class Router
 
     /**
      * Utilise un callback pour charger les routes.
+     * Si le callback n'est pas fourni. Retourne les routes.
      *
-     * @param   string|callable $routes
+     * @param   callable|null $callback
      * @return  self
      */
-    public function routes(callable $callback)
+    public function routes(callable $callback = null)
     {
+        if (is_null($callback))
+        {
+            return $this->routes;
+        }
+
         $callback($this);
 
         return $this;
@@ -308,7 +323,7 @@ class Router
         )
         {
             // Prépare les paramètres matchés.
-            if (count($matches) > 0)
+            if (count($matches) > 1)
             {
                 // Supprime le premier élément du tableau des matches regex.
                 array_shift($matches);
@@ -343,15 +358,60 @@ class Router
             throw new \RuntimeException("Trying to dispatch non-matched route.");
         }
 
-        $route = $this->getIndexedRoute($this->current);
+        return $this->dispatchFromRoute($this->current);
+    }
 
-        // Callback fournie.
-        if (is_callable($route['action']))
+    //-------------------------------------------------------------------------
+
+    /**
+     * Dispatch l'action par défaut si elle existe.
+     *
+     * @param   void
+     * @return  self
+     */
+    protected function dispatchDefault()
+    {
+        if (is_null($this->dispatch_default) === false)
         {
-            return call_user_func_array($route['action'], $this->matched_parameters);
+            return $this->dispatch($this->dispatch_default);
         }
 
-        $call       = explode('@', $route['action']);
+        return $this;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Dispatche une action depuis une route.
+     * La route peut être un index ou une route directement.
+     *
+     * @param   int|array $id
+     * @return  mixed
+     */
+    protected function dispatchFromRoute($id)
+    {
+        $route = is_int($id) ? $this->getIndexedRoute($id) : $id;
+
+        return $this->dispatch($route['action']);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Execute une action
+     *
+     * @param   string|callable $dispatch
+     * @return  self
+     */
+    protected function dispatch($action)
+    {
+        // Callback fournie.
+        if (is_callable($action))
+        {
+            return call_user_func_array($action, $this->matched_parameters);
+        }
+
+        $call       = explode('@', $action);
         $className  = $call[0];
         $methodName = $call[1];
 
@@ -377,7 +437,22 @@ class Router
             }
         }
 
-        throw new \RuntimeException("Unable to dispatch matched route.");
+        throw new \RuntimeException("Unable to dispatch router action.");
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Action à dispatcher quand aucune route n'a été matchée.
+     *
+     * @param   string|callable $callback
+     * @return  self
+     */
+    public function whenNotFound($callback)
+    {
+        $this->dispatch_default = ($callback);
+
+        return $this;
     }
 
     //-------------------------------------------------------------------------

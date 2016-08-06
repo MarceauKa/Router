@@ -72,6 +72,14 @@ $router->routes(function ($router) {
 });
 ```
 
+Si aucun callback n'est donné à routes(), l'ensemble des routes sera retournée.
+
+```php
+$router->get('hello', ...);
+
+var_dump($router->routes()); // Retourne [1 => ['uri' => 'hello', 'action' => '...']]
+```
+
 ### Ecouter les requêtes
 
 Pour que tout fonctionne, il ne manque plus qu'à ce que le routeur écoute les requêtes entrantes :
@@ -111,6 +119,14 @@ D'ailleurs, vous pouvez définir un namespace global à toutes vos actions.
 ```php
 // Appellera App\Http\Controller\Account@resume()
 $router->namespaceWith('App\Http\Controller')->get('mon-compte', 'Account@resume');
+```
+
+Il est également possible de définir une action quand aucune route n'a été matchée.
+
+```php
+$router->whenNotFound(function () {
+    echo 'Page non trouvée';
+});
 ```
 
 ### Paramètres d'URL
