@@ -134,6 +134,42 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
+     * Create instance from compiled.
+     *
+     * @param   string  $compiled
+     * @return  Router
+     */
+    public static function fromCompiled($compiled)
+    {
+        $router = unserialize($compiled);
+
+        // Invalid serialized data.
+        if ($router === false)
+        {
+            throw new \RuntimeException("Given compiled data is invalid.");
+        }
+
+        self::$router = $router;
+
+        return self::getInstance();
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Get serialized current instance.
+     *
+     * @param   void
+     * @return  string
+     */
+    public function getSerialized()
+    {
+        return serialize($this);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * Start listening request...
      *
      * @param   string|null $request_uri    Spoof the request uri.
@@ -212,7 +248,7 @@ class Router
      * With no callback, all compiled routes are returned.
      *
      * @param   callable|null $callback
-     * @return  self
+     * @return  self|array
      */
     public function routes(callable $callback = null)
     {
@@ -676,6 +712,19 @@ class Router
         }
 
         throw new \BadMethodCallException("Invalid method \"$method\".");
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * When sleeping...
+     *
+     * @return  array
+     * @param   void
+     */
+    public function __sleep()
+    {
+        return ['routes', 'names'];
     }
 
     //-------------------------------------------------------------------------

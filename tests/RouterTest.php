@@ -180,4 +180,23 @@ class RouterTest extends TestCase
     }
 
     //-------------------------------------------------------------------------
+
+    /**
+     * Test serialization and unserialization.
+     *
+     * @test
+     */
+    public function testSerializedRoutes()
+    {
+        $this->router->get('hello', 'Action@Method', 'name');
+        $compiled = $this->router->getSerialized();
+
+        $router = Router::fromCompiled($compiled);
+
+        $this->assertNotEquals(spl_object_hash($router), spl_object_hash($this->router));
+        $this->assertInstanceOf(Router::class, $router);
+        $this->assertEquals('/hello', $router->link('name'));
+    }
+
+    //-------------------------------------------------------------------------
 }

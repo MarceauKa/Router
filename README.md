@@ -170,11 +170,31 @@ Le nombre de paramètre passé à la méthode doit être le même que ceux atten
 
 ```php
 $router->get('/tag/{:slug}', '...', 'tag');
-$router->link('tag', 'wordpress'); => Retourne "/tag/wordpress"
+$router->link('tag', 'wordpress'); // => Retourne "/tag/wordpress"
 
 $router->get('/user/{:num}/{:any}', '...', 'profile');
-$router->link('profile', [42, 'JohnDoe']); => Retourne "/profile/42/JohnDoe"
+$router->link('profile', [42, 'JohnDoe']); // => Retourne "/user/42/JohnDoe"
 ```
+
+### Mise en cache
+
+Parfois, lorsque notre Router contient beaucoup de route, il est dommage de le configurer intégralement à chaque éxécution du script. 
+Router supporte bien la **serialization** et la **deserialization**. Deux méthodes existent pour vous aider dans cette tâche.
+
+- Exporter l'instance avec ses routes :
+
+```php
+$compiled = $router->getCompiled(); // Retourne un string
+```
+
+- Importer l'instance :
+
+```php
+$router = Akibatech\Router::fromCompiled($compiled); // Retourne l'instance précédemment compilée
+```
+
+Notez que les **routes utilisant un callback n'est pas supporté**. Seule la notation "MaClasse@maMethode" l'est.  
+Également, Router ne propose pas de fonctionnalité permettant de stocker ou de lire le fichier compilé. Ce n'est pas son but. 
 
 ## Tests
 
