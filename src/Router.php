@@ -25,14 +25,14 @@ class Router
     protected $names = [];
 
     /**
-     * Stocke l'index de la route courante qui a matchée.
+     * Store the current matched route index.
      *
      * @var int
      */
     protected $current;
 
     /**
-     * Stocke les paramètres de routing matchés.
+     * Store the current matched route parameters.
      *
      * @var array
      */
@@ -46,13 +46,15 @@ class Router
     protected $namespace;
 
     /**
-     * Action par défaut quand aucune route n'est matchée.
+     * Default action when no route was matched.
      *
      * @var string|callable
      */
     protected $dispatch_default;
 
     /**
+     * Available HTTP verbs.
+     *
      * @var array
      */
     protected $methods = [
@@ -79,7 +81,7 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Retourne le singleton du Router.
+     * Returns the Router instance (singleton).
      *
      * @param   void
      * @return  Router
@@ -97,7 +99,7 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Retourne une nouvelle instance du Routeur.
+     * Renew the Router instance.
      *
      * @param   void
      * @return  Router
@@ -115,10 +117,10 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Le routeur écoute...
+     * Start listening request...
      *
-     * @param   string|null $request_uri    Permet de spoofer l'URI de la requête.
-     * @param   string|null $request_method Permet de spoofer la méthode de la requête.
+     * @param   string|null $request_uri    Spoof the request uri.
+     * @param   string|null $request_method Spoof the request method.
      * @return  self
      */
     public function listen($request_uri = null, $request_method = null)
@@ -150,8 +152,8 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Utilise un callback pour charger les routes.
-     * Si le callback n'est pas fourni. Retourne les routes.
+     * Load routes configuration with a callback.
+     * With no callback, all compiled routes are returned.
      *
      * @param   callable|null $callback
      * @return  self
@@ -171,12 +173,12 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Ajoute une nouvelle route.
+     * Add a new route.
      *
-     * @param   array  $method
-     * @param   string $uri
-     * @param   string $action
-     * @param   string $name
+     * @param   array  $method Methods to match. Ex: ['GET'], ['GET', 'POST'], ...
+     * @param   string $uri URI to match.
+     * @param   string $action Action when the route is matched.
+     * @param   string $name Human name for the route
      * @return  self
      */
     public function add(array $methods, $uri, $action, $as = null)
@@ -185,14 +187,14 @@ class Router
         $uri     = $this->validateRouteUri($uri);
         $index   = count($this->routes) + 1;
 
-        // Ajoute la route.
+        // Add the route to the compiled routes.
         $this->routes[$index] = [
             'methods' => $methods,
             'uri'     => $uri,
             'action'  => $action
         ];
 
-        // La route est nommée.
+        // Given route as a name.
         if (is_null($as) === false)
         {
             $as = $this->validateRouteNamed($as);
@@ -206,14 +208,14 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Retourne une route par son index.
+     * Returns a route by its index.
      *
      * @param   int $index
      * @return  array
      */
     public function getIndexedRoute($index)
     {
-        // L'index existe
+        // Given index exists.
         if (array_key_exists($index, $this->routes))
         {
             return $this->routes[$index];
@@ -225,7 +227,7 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Vérifie une méthode ou plusieurs méthodes.
+     * Validate a method (or many method).
      *
      * @param   string|array $methods
      * @return  string|array
@@ -260,14 +262,14 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Valide une URI, transforme les segments d'URL en regex.
+     * Validate an URI and transforms URI params.
      *
      * @param   string $uri
      * @return  string
      */
     protected function validateRouteUri($uri)
     {
-        // Supprime les "/" de début et de fin.
+        // Delete leading and trailing slashes.
         $uri = trim($uri, '/');
         $uri = str_replace([
             '.',
@@ -283,19 +285,19 @@ class Router
             '\/'
         ], $uri);
 
-        // Boucle tant que la chaîne contient { ou }.
+        // While the URI contains {:...}
         while (preg_match('/\{\:(.*)+\}/', $uri) >= 1)
         {
-            // Transforme :num
+            // Transform :num
             $uri = preg_replace('/\{\:num\}/', '([0-9]+)', $uri);
 
-            // Transforme :string
+            // Transform :string
             $uri = preg_replace('/\{\:alpha\}/', '([a-z]+)', $uri);
 
-            // Transforme :any
+            // Transform :any
             $uri = preg_replace('/\{\:any\}/', '([a-z0-9\_\.\:\,\-]+)', $uri);
 
-            // Transforme :slug
+            // Transform :slug
             $uri = preg_replace('/\{\:slug\}/', '([a-z0-9\-]+)', $uri);
         }
 
@@ -305,8 +307,8 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Valide le nom d'une route.
-     * Notamment qu'il ne soit pas déjà pris...
+     * Validate a route name.
+     * Exception when the name is already taken.
      *
      * @param   string $as
      * @return  string
@@ -324,31 +326,31 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Vérifie si une route matche à la méthode et l'URI fournie.
+     * Check if a route match.
      *
-     * @param   int    $index Index de la route.
-     * @param   string $uri
-     * @param   string $method
+     * @param   int    $index The route index.
+     * @param   string $uri The request uri.
+     * @param   string $method The request method.
      * @return  bool
      */
     protected function routeMatch($index, $uri = '', $method = 'GET')
     {
-        // Récupère la route
+        // Get the route by its index.
         $route = $this->getIndexedRoute($index);
 
-        // Construit le pattern
+        // Build regex pattern.
         $pattern = '#^' . $route['uri'] . '$#iu';
 
-        // Stocke temporairement les paramètres matchés
+        // Prepare var for matched parameters.
         $matches = [];
 
         if (preg_match_all($pattern, $uri, $matches) > 0 && in_array($method, $route['methods'])
         )
         {
-            // Prépare les paramètres matchés.
+            // There's matched parameters.
             if (count($matches) > 1)
             {
-                // Supprime le premier élément du tableau des matches regex.
+                // Delete the first item.
                 array_shift($matches);
 
                 foreach ($matches as $match)
@@ -368,14 +370,14 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Exécute une route.
+     * Dispatch the current matched route.
      *
      * @param   null|int $route
      * @return  mixed
      */
     protected function dispatchCurrent()
     {
-        // Pas de route courante ?
+        // There's no matched route.
         if (is_null($this->current))
         {
             throw new \RuntimeException("Trying to dispatch non-matched route.");
@@ -387,7 +389,7 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Dispatch l'action par défaut si elle existe.
+     * Dispatch the default action.
      *
      * @param   void
      * @return  self
@@ -405,8 +407,7 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Dispatche une action depuis une route.
-     * La route peut être un index ou une route directement.
+     * Dispatch an action by a route or a route index.
      *
      * @param   int|array $id
      * @return  mixed
@@ -421,14 +422,14 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Execute une action
+     * Dispatch an action.
      *
      * @param   string|callable $dispatch
      * @return  self
      */
     protected function dispatch($action)
     {
-        // Callback fournie.
+        // Action is callable.
         if (is_callable($action))
         {
             return call_user_func_array($action, $this->matched_parameters);
@@ -438,19 +439,19 @@ class Router
         $className  = $call[0];
         $methodName = $call[1];
 
-        // Ajout le namespace par défaut à la classe.
+        // Adds the default namespace if present.
         if (is_null($this->namespace) === false)
         {
             $className = $this->namespace . $className;
         }
 
-        // Classe + méthode fournie.
+        // Dispatch a class + method.
         if (class_exists($className))
         {
-            // Instancie la classe.
+            // Instanciate the given class.
             $class = new $className;
 
-            // La méthode existe sur la classe.
+            // Class contains the given method.
             if (method_exists($class, $methodName))
             {
                 return call_user_func_array([
@@ -466,7 +467,7 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Action à dispatcher quand aucune route n'a été matchée.
+     * Action to dispatch when there's no route match.
      *
      * @param   string|callable $callback
      * @return  self
@@ -481,14 +482,14 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Définit un namespace par défaut pour dispatcher les actions.
+     * Define a default namespace for actions.
      *
      * @param   string $namespace
      * @return  self
      */
     public function namespaceWith($namespace = '')
     {
-        // Pas de namespace.
+        // Disable namespace.
         if (empty($namespace))
         {
             $namespace = null;
@@ -506,14 +507,13 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Retourne la méthode de la requête.
+     * Returns the request method.
      *
      * @param   void
      * @return  string
      */
     protected function getRequestMethod($default = null)
     {
-        // CLI ?
         if ($this->isCliRequest())
         {
             return is_null($default) ? 'GET' : strtoupper($default);
@@ -525,14 +525,13 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Retourne l'URI de la requête.
+     * Returns the request URI.
      *
      * @param   void
      * @return  string
      */
     protected function getRequestUri($default = null)
     {
-        // CLI ?
         if ($this->isCliRequest())
         {
             return is_null($default) ? '' : $default;
@@ -544,7 +543,7 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Vérifie si la requête est de type CLI.
+     * Are we in CLI mode?
      *
      * @param   void
      * @return  bool
@@ -559,8 +558,8 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
-     * Appel de méthode dynamique.
-     * Utile pour les méthodes get(), post(), put() qui sont des alias de add().
+     * Dynamic call.
+     * Used for get(), post(), put(), patch(), delete() and any() (alias of add())
      *
      * @param   string $method
      * @param   array  $args
@@ -568,14 +567,14 @@ class Router
      */
     public function __call($method, $args = [])
     {
-        // Ajout dynamique par verbe HTTP.
+        // Dynamic add for http verbs()
         if (in_array(strtoupper($method), $this->methods))
         {
             $as = !empty($args[2]) ? $args[2] : null;
 
             return $this->add([$method], $args[0], $args[1], $as);
         }
-        // Méthode "any" => Correspond à tous les verbes.
+        // Dynamic add for any()
         else if ($method === 'any')
         {
             $as = !empty($args[2]) ? $args[2] : null;
