@@ -724,7 +724,7 @@ class Router
      */
     public function __sleep()
     {
-        return ['routes', 'names'];
+        return ['routes', 'names', 'namespace'];
     }
 
     //-------------------------------------------------------------------------
