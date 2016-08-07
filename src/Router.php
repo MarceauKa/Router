@@ -39,6 +39,23 @@ class Router
     protected $matched_parameters = [];
 
     /**
+     * Regex pattern used to match route variables.
+     *
+     * @var string
+     */
+    protected $parameters_pattern = '/{:\w+}/';
+
+    /**
+     * @var array
+     */
+    protected $parameters = [
+        '{:num}'   => '([0-9]+)',
+        '{:alpha}' => '([a-z]+)',
+        '{:any}'   => '([a-z0-9\_\.\:\,\-]+)',
+        '{:slug}'  => '([a-z0-9\-]+)',
+    ];
+
+    /**
      * Store the default namespace for dispatching actions.
      *
      * @var null|string
@@ -73,7 +90,7 @@ class Router
      * @param   void
      * @return  self
      */
-    private function __construct()
+    protected function __construct()
     {
         self::$router = $this;
     }
@@ -152,6 +169,45 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
+     * Returns a link to a named route. Pass the route name or its ID.
+     * Second parameters is to pass variables to the route.
+     *
+     * @param   string|int  $name
+     * @param   array|mixed $params
+     * @return  string
+     */
+    public function link($name, $params = [])
+    {
+        // Indexed route or named route?
+        $route = is_int($name) ? $this->getIndexedRoute($name) : $this->getNamedRoute($name);
+
+        $uri = $route['uri'];
+
+        // This route contains bindings.
+        if ($route['bindings'] === true)
+        {
+            $uri    = $route['original'];
+            $params = is_array($params) ? $params : [$params];
+
+            while ($this->routeHasBindings($uri) === true || count($params) > 0)
+            {
+                $uri = preg_replace($this->parameters_pattern, $params[0], $uri, 1);
+                array_shift($params);
+            }
+
+            // Il reste des paramètres dans l'URI
+            if ($this->routeHasBindings($uri) === true || count($params) > 0)
+            {
+                throw new \InvalidArgumentException("Route params count not match given parents count.");
+            }
+        }
+
+        return '/' . $uri;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * Load routes configuration with a callback.
      * With no callback, all compiled routes are returned.
      *
@@ -176,22 +232,26 @@ class Router
      * Add a new route.
      *
      * @param   array  $method Methods to match. Ex: ['GET'], ['GET', 'POST'], ...
-     * @param   string $uri URI to match.
+     * @param   string $uri    URI to match.
      * @param   string $action Action when the route is matched.
-     * @param   string $name Human name for the route
+     * @param   string $name   Human name for the route
      * @return  self
      */
     public function add(array $methods, $uri, $action, $as = null)
     {
-        $methods = $this->validateRouteMethods($methods);
-        $uri     = $this->validateRouteUri($uri);
-        $index   = count($this->routes) + 1;
+        $original = $uri;
+        $methods  = $this->validateRouteMethods($methods);
+        $bindings = $this->routeHasBindings($uri);
+        $uri      = $this->validateRouteUri($uri);
+        $index    = count($this->routes) + 1;
 
         // Add the route to the compiled routes.
         $this->routes[$index] = [
-            'methods' => $methods,
-            'uri'     => $uri,
-            'action'  => $action
+            'methods'  => $methods,
+            'uri'      => $uri,
+            'original' => $original,
+            'action'   => $action,
+            'bindings' => $bindings
         ];
 
         // Given route as a name.
@@ -203,6 +263,24 @@ class Router
         }
 
         return $this;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Returns a route by its name.
+     *
+     * @param   string $name
+     * @return  array
+     */
+    public function getNamedRoute($name)
+    {
+        if (false !== $index = array_search($name, $this->names))
+        {
+            return $this->getIndexedRoute($index);
+        }
+
+        throw new \RuntimeException("No route named with \"$name\".");
     }
 
     //-------------------------------------------------------------------------
@@ -262,6 +340,27 @@ class Router
     //-------------------------------------------------------------------------
 
     /**
+     * Checks if a route contains any bindings.
+     * A string URI can be passed or an array containing a compiled route.
+     *
+     * @param   string|array $uri
+     * @return  bool
+     */
+    protected function routeHasBindings($uri)
+    {
+        if (is_array($uri))
+        {
+            return $uri['bindings'] === true;
+        }
+        else
+        {
+            return preg_match($this->parameters_pattern, $uri) >= 1;
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * Validate an URI and transforms URI params.
      *
      * @param   string $uri
@@ -286,19 +385,13 @@ class Router
         ], $uri);
 
         // While the URI contains {:...}
-        while (preg_match('/\{\:(.*)+\}/', $uri) >= 1)
+        while ($this->routeHasBindings($uri) === true)
         {
-            // Transform :num
-            $uri = preg_replace('/\{\:num\}/', '([0-9]+)', $uri);
-
-            // Transform :string
-            $uri = preg_replace('/\{\:alpha\}/', '([a-z]+)', $uri);
-
-            // Transform :any
-            $uri = preg_replace('/\{\:any\}/', '([a-z0-9\_\.\:\,\-]+)', $uri);
-
-            // Transform :slug
-            $uri = preg_replace('/\{\:slug\}/', '([a-z0-9\-]+)', $uri);
+            // Apply parameters patterns
+            foreach ($this->parameters as $key => $pattern)
+            {
+                $uri = preg_replace("/$key/iu", $pattern, $uri);
+            }
         }
 
         return $uri;
@@ -328,8 +421,8 @@ class Router
     /**
      * Check if a route match.
      *
-     * @param   int    $index The route index.
-     * @param   string $uri The request uri.
+     * @param   int    $index  The route index.
+     * @param   string $uri    The request uri.
      * @param   string $method The request method.
      * @return  bool
      */

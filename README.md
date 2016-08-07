@@ -4,7 +4,8 @@
 
 Router est un petit routeur de requête HTTP écrit en PHP.  
 
-Il fait le job, bien que pas encore testé. Utilisez le si vous avez besoin d'une **base simple à comprendre** ou si **votre besoin est minimal**. Sinon, regardez du côté des merveilleuses librairies [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou encore [league/route](http://route.thephpleague.com/).
+Il sera votre compagnon idéal si vous avez besoin d'une librairie simple et efficace ou si vous recherchez une **base simple à comprendre**.  
+Sinon, regardez du côté des merveilleuses librairies [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou encore [league/route](http://route.thephpleague.com/).
 
 ## Installation
 
@@ -155,6 +156,26 @@ $router->get('profil/{:num}/{:alpha}', function ($id, $name) {
 });
 ```
 
+### Nommer les routes
+
+Il vous est possible de **nommer vos routes** afin d'y accèder plus rapidement pour créer des liens (dans vos vues par exemple).  
+
+```php
+$router->get('/homepage', '...', 'home');
+$router->link('home'); // Retourne "/homepage"
+```
+
+Si votre route contient des paramètres, il est possible de récupérer l'URI avec des paramètres.  
+Le nombre de paramètre passé à la méthode doit être le même que ceux attendus dans l'URI, auquel cas, une erreur sera levée.
+
+```php
+$router->get('/tag/{:slug}', '...', 'tag');
+$router->link('tag', 'wordpress'); => Retourne "/tag/wordpress"
+
+$router->get('/user/{:num}/{:any}', '...', 'profile');
+$router->link('profile', [42, 'JohnDoe']); => Retourne "/profile/42/JohnDoe"
+```
+
 ## Tests
 
 Les tests sont effectués avec PHPUnit 5.5. Si vous n'avez pas **phpunit** installé globalement, ils peuvent l'être via **vendor/bin**.
@@ -167,7 +188,8 @@ Les tests ne sont pas encore tous en place. N'hésitez pas à contribuer.
 
 ## Contribuer
 
-Le routeur est très simple et pas encore testé. N'hésitez pas à proposer vos améliorations !
+Le routeur est très simple pour le moment et n'a pas été poussé dans ses derniers retranchements.  
+N'hésitez pas à proposer vos améliorations !
 
 ## Licence
 

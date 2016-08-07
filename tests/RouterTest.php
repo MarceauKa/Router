@@ -3,6 +3,7 @@
 namespace Akibatech\Tests;
 
 use Akibatech\Router;
+use Akibatech\Tests\Fixtures\MyRouter;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -139,6 +140,43 @@ class RouterTest extends TestCase
 
         $post = $this->router->listen('form/42/T0k3n', 'post');
         $this->assertEquals('42T0k3n', $post);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Teste les routes nommées.
+     *
+     * @test
+     */
+    public function testNamedRoute()
+    {
+        $this->router
+            ->get('homepage', '...', 'home')
+            ->get('tag/{:slug}', '...', 'tag')
+            ->get('profile/{:num}/{:any}', '...', 'profile');
+
+        $route1 = $this->router->link('home');
+        $route2 = $this->router->link('tag', 'wordpress');
+        $route3 = $this->router->link('profile', [42, 'JohnDoe']);
+
+        $this->assertEquals($route1, '/homepage');
+        $this->assertEquals($route2, '/tag/wordpress');
+        $this->assertEquals($route3, '/profile/42/JohnDoe');
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Test duplicate route name.
+     *
+     * @test
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNamedRouteOnDuplicateException()
+    {
+        $this->router->get('foo', '...', 'route1');
+        $this->router->get('bar', '...', 'route1');
     }
 
     //-------------------------------------------------------------------------
