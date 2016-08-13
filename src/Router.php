@@ -408,16 +408,12 @@ class Router
         $uri = trim($uri, '/');
         $uri = str_replace([
             '.',
-            '-',
             '?',
             '&',
-            '/'
         ], [
             '\.',
-            '\-',
             '\?',
             '\&',
-            '\/'
         ], $uri);
 
         // While the URI contains {:...}
