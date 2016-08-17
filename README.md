@@ -90,7 +90,10 @@ var_dump($router->routes()); // Retourne [1 => ['uri' => 'hello', 'action' => '.
 Pour que tout fonctionne, il ne manque plus qu'à ce que le routeur écoute les requêtes entrantes :
 
 ```php
+// Utilise par défaut REQUEST_URI et REQUEST_METHOD
 $router->listen();
+// Vous pouvez fournir au router l'URI et la méthode (via une autre librairie par exemple)
+$router->listing('request', 'method');
 ```
 
 ### Dispatcher les routes

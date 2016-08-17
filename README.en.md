@@ -85,7 +85,8 @@ var_dump($router->routes()); // Returns [1 => ['uri' => 'hello', 'action' => '..
 
 ### Listening requests
 
-For everything to work, Router needs to incoming requests:
+For everything to work, Router needs to incoming requests:  
+
 ```php
 // Will use REQUEST_URI and REQUEST_METHOD
 $router->listen();
