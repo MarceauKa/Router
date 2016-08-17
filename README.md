@@ -5,7 +5,9 @@
 Router est un petit routeur de requête HTTP écrit en PHP.  
 
 Il sera votre compagnon idéal si vous avez besoin d'une librairie simple et efficace ou si vous recherchez une **base simple à comprendre**.  
-Sinon, regardez du côté des merveilleuses librairies [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou encore [league/route](http://route.thephpleague.com/).
+Sinon, regardez du côté des merveilleuses librairies [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou encore [league/route](http://route.thephpleague.com/).  
+
+English documentation [is here](README.en.md).
 
 ## Installation
 
