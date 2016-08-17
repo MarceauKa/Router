@@ -7,7 +7,7 @@ Router is a lightweight HTTP resquest router written in PHP.
 It will be your perfect companion if you need a simple and effective library or if you want an **easy to understand routing library**.  
 Otherwise, take a look at these awesome libraries [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou [league/route](http://route.thephpleague.com/).
 
-!(French doc)[https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/flat/16/France.png] Documentation en français [dispo ici](README.md).
+![French doc](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/flat/16/France.png) Documentation en français [dispo ici](README.md).
 
 ## Installation
 
