@@ -1,6 +1,6 @@
 # Router
 
-[![Build Status](https://travis-ci.org/AkibaTech/Router.svg?branch=master)](https://travis-ci.org/AkibaTech/Router) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/646acaa9-b90b-4d71-b6e3-ebe9a377b622/mini.png?branch=master)](https://insight.sensiolabs.com/projects/646acaa9-b90b-4d71-b6e3-ebe9a377b622)
+[![Build Status](https://travis-ci.org/AkibaTech/Router.svg?branch=master)](https://travis-ci.org/AkibaTech/Router) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/646acaa9-b90b-4d71-b6e3-ebe9a377b622/mini.png?branch=master)](https://insight.sensiolabs.com/projects/646acaa9-b90b-4d71-b6e3-ebe9a377b622) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AkibaTech/Router/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AkibaTech/Router/?branch=master)
 
 Router est un petit routeur de requête HTTP écrit en PHP.  
 

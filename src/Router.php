@@ -88,7 +88,6 @@ class Router
      * Router constructor.
      *
      * @param   void
-     * @return  self
      */
     protected function __construct()
     {
@@ -267,10 +266,10 @@ class Router
     /**
      * Add a new route.
      *
-     * @param   array  $method Methods to match. Ex: ['GET'], ['GET', 'POST'], ...
+     * @param   array  $methods Methods to match. Ex: ['GET'], ['GET', 'POST'], ...
      * @param   string $uri    URI to match.
      * @param   string $action Action when the route is matched.
-     * @param   string $name   Human name for the route
+     * @param   string $as   Human name for the route
      * @return  self
      */
     public function add(array $methods, $uri, $action, $as = null)
@@ -497,7 +496,7 @@ class Router
     /**
      * Dispatch the current matched route.
      *
-     * @param   null|int $route
+     * @param   void
      * @return  mixed
      */
     protected function dispatchCurrent()
@@ -549,7 +548,7 @@ class Router
     /**
      * Dispatch an action.
      *
-     * @param   string|callable $dispatch
+     * @param   string|callable $action
      * @return  self
      */
     protected function dispatch($action)
