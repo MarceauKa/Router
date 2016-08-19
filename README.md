@@ -31,10 +31,10 @@ RewriteRule ^ index.php [L]
 
 ### Instanciation
 
-Router fonctionne autour d'un singleton et ne se construit pas directement. Appelez le ainsi :  
+Router ne prend aucun paramètre, instanciez le de cette façon:
 
 ```php
-$router = Akibatech\Router::getInstance();
+$router = new Router;
 ```
 
 ### Ajouter des routes

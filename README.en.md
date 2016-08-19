@@ -31,10 +31,10 @@ RewriteRule ^ index.php [L]
 
 ### Instanciation
 
-Router is singleton based and can't directly constructed. Get the instance like that:  
+Router as no params.
 
 ```php
-$router = Akibatech\Router::getInstance();
+$router = new Router;
 ```
 
 ### Adding routes

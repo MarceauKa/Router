@@ -10,11 +10,6 @@ namespace Akibatech;
 class Router
 {
     /**
-     * @var self
-     */
-    protected static $router;
-
-    /**
      * @var array
      */
     protected $routes = [];
@@ -89,51 +84,12 @@ class Router
      *
      * @param   void
      */
-    protected function __construct()
-    {
-        self::$router = $this;
-    }
+    public function __construct() { }
 
     //-------------------------------------------------------------------------
 
     /**
-     * Returns the Router instance (singleton).
-     *
-     * @param   void
-     * @return  Router
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$router) === true)
-        {
-            self::$router = new self;
-        }
-
-        return self::$router;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Renew the Router instance.
-     *
-     * @param   void
-     * @return  Router
-     */
-    public static function renewInstance()
-    {
-        if (is_null(self::$router) === false)
-        {
-            self::$router = new self;
-        }
-
-        return self::getInstance();
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Create instance from compiled.
+     * Create instance from a serialized instance.
      *
      * @param   string  $compiled
      * @return  Router
@@ -148,20 +104,18 @@ class Router
             throw new \RuntimeException("Given compiled data is invalid.");
         }
 
-        self::$router = $router;
-
-        return self::getInstance();
+        return $router;
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * Get serialized current instance.
+     * Get the serialized current instance.
      *
      * @param   void
      * @return  string
      */
-    public function getSerialized()
+    public function getCompiled()
     {
         return serialize($this);
     }

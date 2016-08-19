@@ -28,7 +28,7 @@ class RouterTest extends TestCase
      */
     protected function setUp()
     {
-        $this->router = Router::renewInstance();
+        $this->router = new Router();
     }
 
     //-------------------------------------------------------------------------
@@ -42,7 +42,6 @@ class RouterTest extends TestCase
     {
         $this->assertInstanceOf(Router::class, $this->router);
         $this->assertEmpty($this->router->routes());
-        $this->assertEquals($this->router, Router::getInstance());
     }
 
     //-------------------------------------------------------------------------
@@ -189,7 +188,7 @@ class RouterTest extends TestCase
     public function testSerializedRoutes()
     {
         $this->router->get('hello', 'Action@Method', 'name');
-        $compiled = $this->router->getSerialized();
+        $compiled = $this->router->getCompiled();
 
         $router = Router::fromCompiled($compiled);
 
