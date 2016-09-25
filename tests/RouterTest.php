@@ -95,7 +95,7 @@ class RouterTest extends TestCase
                 return 'Not found!';
             });
 
-        $output = $this->router->listen('misssing');
+        $output = $this->router->listen('misssing', 'GET');
         $this->assertEquals('Not found!', $output);
     }
 
@@ -125,16 +125,16 @@ class RouterTest extends TestCase
                 return $id.$token;
             });
 
-        $id = $this->router->listen('foo/2');
+        $id = $this->router->listen('foo/2', 'get');
         $this->assertEquals('2', $id);
 
-        $slug = $this->router->listen('bar/hello-world');
+        $slug = $this->router->listen('bar/hello-world', 'get');
         $this->assertEquals('hello-world', $slug);
 
-        $custom = $this->router->listen('baz/custom_uri');
+        $custom = $this->router->listen('baz/custom_uri', 'get');
         $this->assertEquals('custom_uri', $custom);
 
-        $name = $this->router->listen('kux/akibatech');
+        $name = $this->router->listen('kux/akibatech', 'get');
         $this->assertEquals('akibatech', $name);
 
         $post = $this->router->listen('form/42/T0k3n', 'post');

@@ -592,12 +592,9 @@ class Router
      */
     protected function getRequestMethod($default = null)
     {
-        if ($this->isCliRequest())
-        {
-            return is_null($default) ? 'GET' : strtoupper($default);
-        }
+        $method = is_null($default) ? $_SERVER['REQUEST_METHOD'] : $default;
 
-        return strtoupper($_SERVER['REQUEST_METHOD']);
+        return strtoupper($method);
     }
 
     //-------------------------------------------------------------------------
@@ -610,27 +607,9 @@ class Router
      */
     protected function getRequestUri($default = null)
     {
-        if ($this->isCliRequest())
-        {
-            return is_null($default) ? '' : $default;
-        }
+        $uri = is_null($default) ? $_SERVER['REQUEST_URI'] : $default;
 
-        return trim($_SERVER['REQUEST_URI'], '/');
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Are we in CLI mode?
-     *
-     * @param   void
-     * @return  bool
-     */
-    protected function isCliRequest()
-    {
-        return (php_sapi_name() == 'cli'
-            || defined('STDIN')
-            || array_key_exists('REQUEST_METHOD', $_SERVER) === false);
+        return trim($uri, '/');
     }
 
     //-------------------------------------------------------------------------
