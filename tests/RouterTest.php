@@ -1,56 +1,27 @@
 <?php
 
-namespace Akibatech\Tests;
+namespace MarceauKa\Tests;
 
-use Akibatech\Router;
-use Akibatech\Tests\Fixtures\MyRouter;
+use MarceauKa\Router;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Class RouterTest
- *
- * @package Akibatech\Tests
- */
 final class RouterTest extends TestCase
 {
-    /**
-     * @var Router
-     */
     protected $router;
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * SetUp new Router for each test.
-     *
-     * @param   void
-     * @return  void
-     */
     protected function setUp(): void
     {
         $this->router = new Router();
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Teste l'instanciation et l'instance créée par défaut.
-     *
-     * @test
-     */
+    /** @test */
     public function testDefaultInstance()
     {
         $this->assertInstanceOf(Router::class, $this->router);
         $this->assertEmpty($this->router->routes());
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Teste la création d'une route en GET.
-     *
-     * @test
-     */
+    /** @test */
     public function testGetRouteCreation()
     {
         $this->router->get('hello', function() {
@@ -60,13 +31,7 @@ final class RouterTest extends TestCase
         $this->assertNotEmpty($this->router->routes());
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Teste la capture d'une requête en GET et également le retour quand il n'y a pas de matching.
-     *
-     * @test
-     */
+    /** @test */
     public function testGetRouteListening()
     {
         $this->router->get('hello', function() {
@@ -80,13 +45,7 @@ final class RouterTest extends TestCase
         $this->assertInstanceOf(Router::class, $return_without_matching);
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Teste l'action par défaut quand il n'y a aucun retour.
-     *
-     * @test
-     */
+    /** @test */
     public function testNotFoundMatching()
     {
         $this->router
@@ -99,13 +58,7 @@ final class RouterTest extends TestCase
         $this->assertEquals('Not found!', $output);
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Teste les paramètres d'URL.
-     *
-     * @test
-     */
+    /** @test */
     public function testRouteParametersBindings()
     {
         $this->router
@@ -141,13 +94,7 @@ final class RouterTest extends TestCase
         $this->assertEquals('42T0k3n', $post);
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Teste les routes nommées.
-     *
-     * @test
-     */
+    /** @test */
     public function testNamedRoute()
     {
         $this->router
@@ -164,14 +111,7 @@ final class RouterTest extends TestCase
         $this->assertEquals($route3, '/profile/42/JohnDoe');
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Test duplicate route name.
-     *
-     * @test
-     * @expectedException \InvalidArgumentException
-     */
+    /** @test */
     public function testNamedRouteOnDuplicateException()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -179,13 +119,7 @@ final class RouterTest extends TestCase
         $this->router->get('bar', '...', 'route1');
     }
 
-    //-------------------------------------------------------------------------
-
-    /**
-     * Test serialization and unserialization.
-     *
-     * @test
-     */
+    /** @test */
     public function testSerializedRoutes()
     {
         $this->router->get('hello', 'Action@Method', 'name');
@@ -197,6 +131,4 @@ final class RouterTest extends TestCase
         $this->assertInstanceOf(Router::class, $router);
         $this->assertEquals('/hello', $router->link('name'));
     }
-
-    //-------------------------------------------------------------------------
 }

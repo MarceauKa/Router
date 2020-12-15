@@ -1,8 +1,9 @@
 {
   "type": "library",
-  "name": "akibatech/router",
-  "description": "Routeur HTTP basique \u00e9crit en PHP sans aucune d\u00e9pendance.",
+  "name": "marceauka/router",
+  "description": "Simple PHP Router with no dependencies",
   "license": "MIT",
+  "version": "1.0.0",
   "minimum-stability": "stable",
   "authors": [
     {
@@ -11,8 +12,8 @@
     }
   ],
   "keywords": [
-    "routeur",
     "router",
+    "http",
     "library",
     "simple",
     "routes",
@@ -21,16 +22,16 @@
   ],
   "autoload": {
     "psr-4": {
-      "Akibatech\\": "src/"
+      "MarceauKa\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Akibatech\\Tests\\": "tests/"
+      "MarceauKa\\Tests\\": "tests/"
     }
   },
   "require": {
-    "php": ">=7.3"
+    "php": ">=7.4|>=8.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9"

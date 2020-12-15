@@ -4,8 +4,8 @@ dist: xenial
 
 language: php
 php:
+  - 8.0
   - 7.4
-  - 7.3
 
 before_script: composer install
 

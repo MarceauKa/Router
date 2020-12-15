@@ -1,24 +1,22 @@
 # Router
 
-[![Build Status](https://travis-ci.org/AkibaTech/Router.svg?branch=master)](https://travis-ci.org/AkibaTech/Router) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/646acaa9-b90b-4d71-b6e3-ebe9a377b622/mini.png?branch=master)](https://insight.sensiolabs.com/projects/646acaa9-b90b-4d71-b6e3-ebe9a377b622) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AkibaTech/Router/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AkibaTech/Router/?branch=master)
+[![Build Status](https://travis-ci.org/MarceauKa/Router.svg?branch=master)](https://travis-ci.org/MarceauKa/Router)
 
-Router est un petit routeur de requête HTTP écrit en PHP.  
+Router is a lightweight HTTP resquest router written in PHP.  
 
-Il sera votre compagnon idéal si vous avez besoin d'une librairie simple et efficace ou si vous recherchez une **base simple à comprendre**.  
-Sinon, regardez du côté des merveilleuses librairies [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou encore [league/route](http://route.thephpleague.com/).  
-
-![English doc](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/flat/16/United-Kingdom.png) English documentation [is here](README.en.md).
+It will be your perfect companion if you need a simple and effective library or if you want an **easy to understand routing library**.  
+Otherwise, take a look at these awesome libraries [symfony/routing](https://symfony.com/doc/current/components/routing.html) ou [league/route](http://route.thephpleague.com/).
 
 ## Installation
 
-L'installation se fait idéalement via composer.  
-`composer require akibatech/router dev-master`
+Router can be installed with composer: `composer require marceauka/router`.
+For now, it requires PHP 7.4 or 8.0.
 
-Ou sinon, copiez le fichier **src/Router.php** où vous le souhaitez et faites en un **require**.
+Also, copy / paste **src/Router.php** where you want and **require it**.  
 
-## Configurer Apache
+## Configure Apache
 
-Le routeur fonctionne très bien avec tout type d'URL. Mais si vous faites de l'URL rewriting, vous pouvez créer ce fichier .htaccess.
+The router works perfectly with any kind of URL, but if you want some url rewriting, you can use this example .htaccess.  
 
 ```
 RewriteEngine On
@@ -27,81 +25,80 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [L]
 ```
 
-## Utilisation
+## Usage
 
 ### Instanciation
 
-Router ne prend aucun paramètre, instanciez le de cette façon:
+Router as no params.
 
 ```php
 $router = new Router;
 ```
 
-### Ajouter des routes
+### Adding routes
 
-Une fois l'instance en main, ajouter des routes est très simple.  
+Once you have the instance, adding routes is childish.  
 
 ```php
-// Répondra à : /hello (en GET)
+// Will respond to : /hello (en GET)
 $router->get('hello', function () {
 	echo 'Hello world!';
 });
 ```
 
-Il est aussi possible d'ajouter des règles en **POST**, **PUT**, **PATCH** et **DELETE**.
+Your routes can follow these HTTP verbs: **POST**, **PUT**, **PATCH** and **DELETE**.  
 
 ```php
-// Requête POST
+// POST request
 $router->post(...);
-// Requête PATCH
+// PATCH request
 $router->patch(...);
 ```
 
-Le routeur peut répondre à tous les verbes ou un ou plusieurs verbes HTTP :  
+A route can use many HTTP verbs:  
 
 ```php
-// Requêtes GET et POST
+// GET and POST requests
 $router->add(['GET', 'POST'], 'hello', ...);
-// ... Ou bien, tout type de requêtes
+// ... Or all HTTP verbs
 $router->any('hello', ...);
 ```
 
-Finalement, les routes peuvent être chainées ou ajoutées via un callback :
+Finally, routes can be chained or added with a callback:  
 
 ```php
-// A la chaîne
+// Chaining
 $router->get('foo', ...)->get('bar', ...);
-// ...ou via un callback
+// ...or via a callback
 $router->routes(function ($router) {
 	// Votre logique
 });
 ```
 
-Si aucun callback n'est donné à routes(), l'ensemble des routes sera retournée.
+If no callback is given to the routes() method, all routes will be returned.  
 
 ```php
 $router->get('hello', ...);
 
-var_dump($router->routes()); // Retourne [1 => ['uri' => 'hello', 'action' => '...']]
+var_dump($router->routes()); // Returns [1 => ['uri' => 'hello', 'action' => '...']]
 ```
 
-### Ecouter les requêtes
+### Listening requests
 
-Pour que tout fonctionne, il ne manque plus qu'à ce que le routeur écoute les requêtes entrantes :
+For everything to work, Router needs to incoming requests:  
 
 ```php
-// Utilise par défaut REQUEST_URI et REQUEST_METHOD
+// Will use REQUEST_URI and REQUEST_METHOD
 $router->listen();
-// Vous pouvez fournir au router l'URI et la méthode (via une autre librairie par exemple)
+// You can spoof them with your own logic (Request library for example).
 $router->listing('request', 'method');
 ```
 
-### Dispatcher les routes
+### Dispatching actions
 
-Evidemment, à chaque route, un besoin. A vous de définir une action pour chacune d'entre elle.
+Obviously, for each route, a need. You need to define an action for each of them.  
 
-
-- Un callback :
+- A callback :
 
 ```php
 $router->get('hello', function () {
@@ -109,112 +106,107 @@ $router->get('hello', function () {
 })
 ```
 
-- Une classe (controller, ...) :
+- A class (controller, ...) :
 
 ```php
-$router->get('hello', 'MaClasse@maMethode');
+$router->get('hello', 'MyClass@myMethod');
 ```
 
-Ici, la route, une fois matchée par le routeur instanciera la classe nommée "MaClasse" et appelera la méthode "maMethode".
-Notez que le routeur **accepte les namespaces** à partir du moment où le reste de votre application est capable de les autoloader (PSR-4, ...).
+Here, the route, once matched, will instanciate the class named "MyClass" and will call the "myMethod" method.  
+Note: Router will **accepts namespaces** if you application can autoload them (PSR-4, ...).  
 
 ```php
-$router->get('route-namespace', 'App\Http\Controller@maMethode');
+$router->get('route-namespace', 'App\Http\Controller@myMethod');
 ```
 
-D'ailleurs, vous pouvez définir un namespace global à toutes vos actions.
+Besides, you can define a global namespace for all of your actions.  
 
 ```php
-// Appellera App\Http\Controller\Account@resume()
-$router->namespaceWith('App\Http\Controller')->get('mon-compte', 'Account@resume');
+// Will call App\Http\Controller\Account@resume()
+$router->namespaceWith('App\Http\Controller')->get('mon-account', 'Account@resume');
 ```
 
-Il est également possible de définir une action quand aucune route n'a été matchée.
+You can define a not found action when no routes was matched.  
 
 ```php
 $router->whenNotFound(function () {
-    echo 'Page non trouvée';
+    echo 'Page not found';
 });
 ```
 
-### Paramètres d'URL
+### URL parameters
 
-Vos routes peuvent contenir des paramètres dynamique. Leur utilisation est très simple.
+Your routes can contains dynamic parameters. Usage is simple.  
 
 ```php
-// Autorise "profil/1" ou "profil/12" mais pas "profil/john".
-$router->get('profil/{:num}', ...);
+// Autorise "profile/1" or "profile/12" but not "profile/john".
+$router->get('profile/{:num}', ...);
 ```
 
-Les paramètres peuvent être :  
+Parameters can be:  
 
-- {:num} pour un nombre uniquement
-- {:alpha} pour des lettres uniquement
-- {:any} pour tout type de caractères
-- {:slug} pour les nombres, les lettres et le tiret (-)
+- {:num} for a numeric value
+- {:alpha} for a alpha value
+- {:any} for all kinds of chars
+- {:slug} for numbers, alpha, dash (-) and arobase (@)
 
-Les paramètres sont ensuite envoyés à l'action de la route dans l'ordre définie dans l'URL.  
+Once matched, parameters are sent to the corresponding action in the URL defined order.  
 
 ```php
-$router->get('profil/{:num}/{:alpha}', function ($id, $name) {
-	echo "Mon nom est $name et je porte l'ID n°$id !";
+$router->get('profile/{:num}/{:alpha}', function ($id, $name) {
+	echo "My name is $name and my ID is $id !";
 });
 ```
 
-### Nommer les routes
+### Named routes
 
-Il vous est possible de **nommer vos routes** afin d'y accèder plus rapidement pour créer des liens (dans vos vues par exemple).  
+You can **give a name to your routes** to access them later or easily creating links (in a view for example).  
 
 ```php
 $router->get('/homepage', '...', 'home');
-$router->link('home'); // Retourne "/homepage"
+$router->link('home'); // Returns "/homepage"
 ```
 
-Si votre route contient des paramètres, il est possible de récupérer l'URI avec des paramètres.  
-Le nombre de paramètre passé à la méthode doit être le même que ceux attendus dans l'URI, auquel cas, une erreur sera levée.
+If your route contains parameters, you can build an URI with filled parameters.  
+You need to give all parameters expected by the route, otherwise and exception will be rised.  
 
 ```php
 $router->get('/tag/{:slug}', '...', 'tag');
-$router->link('tag', 'wordpress'); // => Retourne "/tag/wordpress"
+$router->link('tag', 'wordpress'); // => Returns "/tag/wordpress"
 
 $router->get('/user/{:num}/{:any}', '...', 'profile');
-$router->link('profile', [42, 'JohnDoe']); // => Retourne "/user/42/JohnDoe"
+$router->link('profile', [42, 'JohnDoe']); // => Returns "/user/42/JohnDoe"
 ```
 
-### Mise en cache
+### Caching
 
-Parfois, lorsque notre Router contient beaucoup de route, il est dommage de le configurer intégralement à chaque éxécution du script. 
-Router supporte bien la **serialization** et la **deserialization**. Deux méthodes existent pour vous aider dans cette tâche.
+Sometimes, when our router contains many routes, it's convenient to have a ready-to-use Router instance for each script execution. 
+Router supports **serialization** and **unserialization**. Two helpers exists to assists you.  
 
-- Exporter l'instance avec ses routes :
+- Export the configured instance:
 
 ```php
-$compiled = $router->getCompiled(); // Retourne un string
+$compiled = $router->getCompiled(); // Retourns a string
 ```
 
-- Importer l'instance :
+- Import a configured instance:
 
 ```php
-$router = Akibatech\Router::fromCompiled($compiled); // Retourne l'instance précédemment compilée
+$router = MarceauKa\Router::fromCompiled($compiled); // Returns the instance previously configured
 ```
 
-Notez que les **routes utilisant un callback n'est pas supporté**. Seule la notation "MaClasse@maMethode" l'est.  
-Également, Router ne propose pas de fonctionnalité permettant de stocker ou de lire le fichier compilé. Ce n'est pas son but. 
+Note: **Routes using a callback** can't be serialized. Only the "MyClass@myMethod" is serializable.  
+The router does not provide functionnality to store or read a cache file. It's not its goal.  
 
 ## Tests
 
-Les tests sont effectués avec PHPUnit 5.5. Si vous n'avez pas **phpunit** installé globalement, ils peuvent l'être via **vendor/bin**.
+Tests are with PHPUnit 9. You can use the **phpunit** command given at **vendor/bin**.  
 
 ```bash
 vendor/bin/phpunit
 ```
 
-Les tests ne sont pas encore tous en place. N'hésitez pas à contribuer.
-
-## Contribuer
-
-Le routeur est très simple pour le moment et n'a pas été poussé dans ses derniers retranchements.  
-N'hésitez pas à proposer vos améliorations !
+Tests are certainly incomplete. Feel free to contribute.  
 
 ## Licence
 
