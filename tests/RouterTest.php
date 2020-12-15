@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @package Akibatech\Tests
  */
-class RouterTest extends TestCase
+final class RouterTest extends TestCase
 {
     /**
      * @var Router
@@ -26,7 +26,7 @@ class RouterTest extends TestCase
      * @param   void
      * @return  void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router = new Router();
     }
@@ -174,6 +174,7 @@ class RouterTest extends TestCase
      */
     public function testNamedRouteOnDuplicateException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->router->get('foo', '...', 'route1');
         $this->router->get('bar', '...', 'route1');
     }

@@ -46,7 +46,7 @@ class Router
     protected $parameters = [
         '{:num}'   => '([0-9]+)',
         '{:alpha}' => '([a-z]+)',
-        '{:any}'   => '([a-z0-9\_\.\:\,\-]+)',
+        '{:any}'   => '([a-z0-9\_\.\:\,\-\@]+)',
         '{:slug}'  => '([a-z0-9\-]+)',
     ];
 
@@ -593,6 +593,12 @@ class Router
     protected function getRequestMethod($default = null)
     {
         $method = is_null($default) ? $_SERVER['REQUEST_METHOD'] : $default;
+
+        if ($method == 'POST') {
+          if (isset($_POST['_method'])) {
+            $method = $_POST['_method'];
+          }
+        }
 
         return strtoupper($method);
     }
