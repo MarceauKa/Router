@@ -124,7 +124,7 @@ class Router
      * @param  callable|null  $callback
      * @return  self|array
      */
-    public function routes(callable $callback = null)
+    public function routes(?callable $callback = null)
     {
         if (is_null($callback)) {
             return $this->routes;
